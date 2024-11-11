@@ -109,7 +109,8 @@ ENV PUSHER_APP_CLUSTER=${PUSHER_APP_CLUSTER}
 ENV MIX_PUSHER_APP_KEY=${MIX_PUSHER_APP_KEY}
 ENV MIX_PUSHER_APP_CLUSTER=${MIX_PUSHER_APP_CLUSTER}
 
-# Install application dependencies
+# Install application dependencies and set cache driver
+ENV CACHE_DRIVER=file
 RUN composer install --no-dev --optimize-autoloader
 
 # Expose port 9000 and start PHP-FPM server
@@ -117,4 +118,3 @@ EXPOSE 9000
 CMD ["php-fpm"]
 
 RUN echo "APP_ENV=$APP_ENV" && echo "APP_URL=$APP_URL" && echo "DB_HOST=$DB_HOST" # Add more variables as needed
-
