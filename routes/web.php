@@ -16,6 +16,10 @@ use App\Http\Controllers\{
     UserController,
 };
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Log;
+
+Log::debug('This is a debug log message from Laravel!');
+
 
 /*
 |--------------------------------------------------------------------------
