@@ -4,7 +4,7 @@ FROM php:8.2-fpm
 # Set working directory
 WORKDIR /var/www
 
-# Install system dependencies and PHP extensions
+# Install system dependencies, PHP extensions, and Nginx
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -13,7 +13,8 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     zip \
     unzip \
-    libicu-dev && \
+    libicu-dev \
+    nginx && \
     docker-php-ext-install pdo_mysql mysqli mbstring exif pcntl bcmath gd intl
 
 # Install Composer
@@ -24,6 +25,9 @@ COPY . /var/www
 
 # Set permissions (optional, depending on your app)
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+
+# Configure Nginx (copying configuration files from your project)
+COPY nginx/default.conf /etc/nginx/sites-available/default
 
 # Accept build arguments for environment variables
 ARG APP_NAME
@@ -113,13 +117,14 @@ ENV MIX_PUSHER_APP_CLUSTER=${MIX_PUSHER_APP_CLUSTER}
 ENV CACHE_DRIVER=file
 RUN composer install --no-dev --optimize-autoloader
 
-# Expose port 9000 and start PHP-FPM server
-EXPOSE 9000
+# Expose the ports for Nginx and PHP-FPM
+EXPOSE 80 9000
 
-# At runtime, print environment variables before starting the application
+# At runtime, print environment variables before starting Nginx and PHP-FPM
 CMD echo "runtimeeeee APP_ENV: $APP_ENV" && \
     echo "DB_HOST: $DB_HOST" && \
     echo "DB_DATABASE: $DB_DATABASE" && \
     echo "MAIL_HOST: $MAIL_HOST" && \
+    # Start Nginx and PHP-FPM
+    service nginx start && \
     php-fpm
-
