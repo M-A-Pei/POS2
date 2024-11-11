@@ -118,3 +118,5 @@ EXPOSE 9000
 CMD ["php-fpm"]
 
 RUN echo "APP_ENV=$APP_ENV" && echo "APP_URL=$APP_URL" && echo "DB_HOST=$DB_HOST" # Add more variables as needed
+
+RUN echo "Starting PHP-FPM..." && php-fpm -v
