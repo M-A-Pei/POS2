@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     libicu-dev && \
-    docker-php-ext-install pdo_mysql mysqli mbstring exif pcntl bcmath gd intl curl fileinfo gettext
+    docker-php-ext-install pdo_mysql mysqli mbstring exif pcntl bcmath gd intl
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
