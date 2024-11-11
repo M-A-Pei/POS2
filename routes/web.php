@@ -18,8 +18,6 @@ use App\Http\Controllers\{
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Log;
 
-Log::debug('This is a debug log message from Laravel!');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +31,7 @@ Log::debug('This is a debug log message from Laravel!');
 */
 
 Route::get('/', function () {
+    Log::debug('This is a debug log message from Laravel!');
     return redirect()->route('login');
 });
 
