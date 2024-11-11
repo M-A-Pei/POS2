@@ -115,11 +115,6 @@ RUN composer install --no-dev --optimize-autoloader
 
 # Expose port 9000 and start PHP-FPM server
 EXPOSE 9000
-CMD ["php-fpm"]
-
-RUN echo "APP_ENV=$APP_ENV" && echo "APP_URL=$APP_URL" && echo "DB_HOST=$DB_HOST" # Add more variables as needed
-
-RUN echo "Starting PHP-FPM..." && php-fpm -v
 
 # At runtime, print environment variables before starting the application
 CMD echo "runtimeeeee APP_ENV: $APP_ENV" && \
