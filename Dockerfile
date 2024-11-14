@@ -29,7 +29,9 @@ RUN chown -R www-data:www-data /var/www && \
 
 # Configure Nginx (copying configuration files from your project)
 COPY nginx/default.conf /etc/nginx/sites-available/default
-RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+
+# Only create the symlink if it doesn't already exist
+RUN [ ! -f /etc/nginx/sites-enabled/default ] && ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/ || true
 
 # Accept build arguments for environment variables
 ARG APP_NAME
