@@ -124,15 +124,13 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-di
 # Expose the ports for Nginx and PHP-FPM
 EXPOSE 80 9000
 
-# Clear caches before starting
-RUN php artisan config:cache && \
+# Clear caches and config before starting services
+CMD php artisan config:cache && \
     php artisan route:cache && \
-    php artisan view:cache
-
-# Start Nginx and PHP-FPM
-CMD echo "runtimeeeee APP_ENV: $APP_ENV" && \
+    php artisan view:cache && \
+    echo "runtimeeeee APP_ENV: $APP_ENV" && \
     echo "DB_HOST: $DB_HOST" && \
     echo "DB_DATABASE: $DB_DATABASE" && \
     echo "MAIL_HOST: $MAIL_HOST" && \
-    php-fpm & \
-    nginx -g 'daemon off;'
+    service nginx start && \
+    php-fpm
