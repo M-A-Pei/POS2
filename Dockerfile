@@ -25,13 +25,15 @@ COPY . /var/www
 
 # Set permissions (for the whole app directory)
 RUN chown -R www-data:www-data /var/www && \
-    chmod -R 755 /var/www
+    chmod -R 755 /var/www && \
+    chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache && \
+    chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
 # Configure Nginx (copying configuration files from your project)
 COPY nginx/default.conf /etc/nginx/sites-available/default
 
-# Only create the symlink if it doesn't already exist
-RUN [ ! -f /etc/nginx/sites-enabled/default ] && ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/ || true
+# Create the symlink for the Nginx configuration
+RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
 
 # Accept build arguments for environment variables
 ARG APP_NAME
@@ -119,7 +121,7 @@ ENV MIX_PUSHER_APP_CLUSTER=${MIX_PUSHER_APP_CLUSTER}
 
 # Install application dependencies and set cache driver
 ENV CACHE_DRIVER=file
-RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
+RUN composer install --no-dev --optimize-autoloader
 
 # Expose the ports for Nginx and PHP-FPM
 EXPOSE 80 9000
@@ -132,5 +134,5 @@ CMD php artisan config:cache && \
     echo "DB_HOST: $DB_HOST" && \
     echo "DB_DATABASE: $DB_DATABASE" && \
     echo "MAIL_HOST: $MAIL_HOST" && \
-    service nginx start && \
-    php-fpm
+    php-fpm & \
+    nginx -g 'daemon off;'
