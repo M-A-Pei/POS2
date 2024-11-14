@@ -23,11 +23,13 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copy application code
 COPY . /var/www
 
-# Set permissions (optional, depending on your app)
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+# Set permissions (for the whole app directory)
+RUN chown -R www-data:www-data /var/www && \
+    chmod -R 755 /var/www
 
 # Configure Nginx (copying configuration files from your project)
 COPY nginx/default.conf /etc/nginx/sites-available/default
+RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
 
 # Accept build arguments for environment variables
 ARG APP_NAME
@@ -115,16 +117,20 @@ ENV MIX_PUSHER_APP_CLUSTER=${MIX_PUSHER_APP_CLUSTER}
 
 # Install application dependencies and set cache driver
 ENV CACHE_DRIVER=file
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
 
 # Expose the ports for Nginx and PHP-FPM
 EXPOSE 80 9000
 
-# At runtime, print environment variables before starting Nginx and PHP-FPM
+# Clear caches before starting
+RUN php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan view:cache
+
+# Start Nginx and PHP-FPM
 CMD echo "runtimeeeee APP_ENV: $APP_ENV" && \
     echo "DB_HOST: $DB_HOST" && \
     echo "DB_DATABASE: $DB_DATABASE" && \
     echo "MAIL_HOST: $MAIL_HOST" && \
-    # Start Nginx and PHP-FPM
-    service nginx start && \
-    php-fpm
+    php-fpm & \
+    nginx -g 'daemon off;'
